@@ -6,11 +6,14 @@ import CoursEauDuBassin from '@/components/CoursEauDuBassin.vue'
 import InfosBassin from '@/components/InfosBassin.vue'
 import RechercheCommune from '@/components/RechercheCommune.vue'
 import { useBassinStore } from '@/stores/bassin'
+import ZonesInondablesDuBassin from '@/components/ZonesInondablesDuBassin.vue'
 import { useCoursEauStore } from '@/stores/coursEau'
+import { useZonesInondablesStore } from '@/stores/zonesInondables'
 
 const magasin = useBassinStore()
 const { niveau, point, bassin } = storeToRefs(magasin)
 const { affiches: coursEauAffiches, coursEau } = storeToRefs(useCoursEauStore())
+const { affichees: zonesAffichees, zones: zonesInondables } = storeToRefs(useZonesInondablesStore())
 </script>
 
 <template>
@@ -31,9 +34,11 @@ const { affiches: coursEauAffiches, coursEau } = storeToRefs(useCoursEauStore())
         :point="point"
         :bassin="bassin"
         :cours-eau="coursEauAffiches ? coursEau : []"
+        :zones-inondables="zonesAffichees ? zonesInondables : []"
         @choisir-point="magasin.choisirPoint"
       />
       <CoursEauDuBassin />
+      <ZonesInondablesDuBassin />
     </div>
   </div>
 </template>

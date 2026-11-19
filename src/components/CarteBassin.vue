@@ -6,12 +6,14 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import adresseWorker from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Bassin, ContourSet, Position } from '@/lib/bassins'
 import type { CoursEau } from '@/lib/coursEau'
+import { NIVEAUX_CRUE, type ZoneInondable } from '@/lib/zonesInondables'
+import { dessinerMotif, nomImageMotif } from '@/components/motifsZonesInondables'
 
 /**
  * Carte MapLibre, fond « Plan IGN » de la Géoplateforme (data.geopf.fr), avec le contour du bassin
  * et son nom écrit sur la carte. Le texte à côté de la carte (InfosBassin) reste l'alternative accessible.
  */
-const props = defineProps<{ point: Position | null; bassin: Bassin | null; coursEau: CoursEau[] }>()
+const props = defineProps<{ point: Position | null; bassin: Bassin | null; coursEau: CoursEau[]; zonesInondables: ZoneInondable[] }>()
 const emit = defineEmits<{ choisirPoint: [position: Position] }>()
 
 const conteneur = useTemplateRef<HTMLDivElement>('conteneur')
@@ -25,6 +27,7 @@ const FOND_PLAN_IGN =
   '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png'
 const SOURCE_CONTOUR = 'contour-bassin'
 const SOURCE_COURS_EAU = 'cours-eau'
+const SOURCE_ZONES_INONDABLES = 'zones-inondables'
 const IMAGE_FLECHE = 'fleche-ecoulement'
 const CONTOURS_VIDES: ContourSet = { type: 'FeatureCollection', features: [] }
 
@@ -54,6 +57,12 @@ function afficherCoursEau(): void {
   if (!carte) return
   const source = carte.getSource(SOURCE_COURS_EAU) as { setData: (donnees: ContourSet) => void } | undefined
   source?.setData({ type: 'FeatureCollection', features: props.coursEau.map((cours) => cours.trace) })
+}
+
+function afficherZonesInondables(): void {
+  if (!carte) return
+  const source = carte.getSource(SOURCE_ZONES_INONDABLES) as { setData: (donnees: ContourSet) => void } | undefined
+  source?.setData({ type: 'FeatureCollection', features: props.zonesInondables.map((zone) => zone.trace) })
 }
 
 /** Étend les limites avec toutes les coordonnées d'un contour. */
@@ -119,9 +128,18 @@ onMounted(async () => {
         planIgn: { type: 'raster', tiles: [FOND_PLAN_IGN], tileSize: 256, attribution: '© IGN – Géoplateforme' },
         [SOURCE_CONTOUR]: { type: 'geojson', data: CONTOURS_VIDES },
         [SOURCE_COURS_EAU]: { type: 'geojson', data: CONTOURS_VIDES },
+        [SOURCE_ZONES_INONDABLES]: { type: 'geojson', data: CONTOURS_VIDES },
       },
       layers: [
         { id: 'plan-ign', type: 'raster', source: 'planIgn' },
+        // Du niveau le plus fort au plus fréquent : chaque niveau a son motif (pas la couleur seule).
+        ...[...NIVEAUX_CRUE].reverse().map((niveau) => ({
+          id: `zones-inondables-${niveau.id}`,
+          type: 'fill' as const,
+          source: SOURCE_ZONES_INONDABLES,
+          filter: ['==', ['get', 'niveau'], niveau.id] as unknown as boolean,
+          paint: { 'fill-pattern': nomImageMotif(niveau.id) },
+        })),
         { id: 'bassin-remplissage', type: 'fill', source: SOURCE_CONTOUR, paint: { 'fill-color': '#000091', 'fill-opacity': 0.12 } },
         { id: 'bassin-trait', type: 'line', source: SOURCE_CONTOUR, paint: { 'line-color': '#000091', 'line-width': 3, 'line-dasharray': [4, 2] } },
         { id: 'cours-eau-trait', type: 'line', source: SOURCE_COURS_EAU, paint: { 'line-color': '#0a5fa8', 'line-width': 3 } },
@@ -141,9 +159,11 @@ onMounted(async () => {
   carte.on('click', (evenement) => emit('choisirPoint', [evenement.lngLat.lng, evenement.lngLat.lat]))
   carte.on('load', () => {
     carte?.addImage(IMAGE_FLECHE, dessinerFleche())
+    NIVEAUX_CRUE.forEach((niveau) => carte?.addImage(nomImageMotif(niveau.id), dessinerMotif(niveau.motif)))
     afficherPoint()
     afficherBassin()
     afficherCoursEau()
+    afficherZonesInondables()
   })
 })
 
@@ -153,6 +173,7 @@ watch(() => props.point, () => {
 })
 watch(() => props.bassin, afficherBassin)
 watch(() => props.coursEau, afficherCoursEau)
+watch(() => props.zonesInondables, afficherZonesInondables)
 onUnmounted(() => carte?.remove())
 </script>
 
