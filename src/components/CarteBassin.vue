@@ -5,12 +5,13 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 // Le worker de MapLibre, construit par Vite (sinon introuvable une fois le site construit).
 import adresseWorker from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Bassin, ContourSet, Position } from '@/lib/bassins'
+import type { CoursEau } from '@/lib/coursEau'
 
 /**
  * Carte MapLibre, fond « Plan IGN » de la Géoplateforme (data.geopf.fr), avec le contour du bassin
  * et son nom écrit sur la carte. Le texte à côté de la carte (InfosBassin) reste l'alternative accessible.
  */
-const props = defineProps<{ point: Position | null; bassin: Bassin | null }>()
+const props = defineProps<{ point: Position | null; bassin: Bassin | null; coursEau: CoursEau[] }>()
 const emit = defineEmits<{ choisirPoint: [position: Position] }>()
 
 const conteneur = useTemplateRef<HTMLDivElement>('conteneur')
@@ -23,7 +24,37 @@ const FOND_PLAN_IGN =
   'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2' +
   '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png'
 const SOURCE_CONTOUR = 'contour-bassin'
+const SOURCE_COURS_EAU = 'cours-eau'
+const IMAGE_FLECHE = 'fleche-ecoulement'
 const CONTOURS_VIDES: ContourSet = { type: 'FeatureCollection', features: [] }
+
+/** Une flèche blanche cernée de bleu foncé, qui pointe vers la droite : MapLibre la tourne dans le sens du tracé (amont → aval). */
+function dessinerFleche(): ImageData {
+  const taille = 24
+  const toile = document.createElement('canvas')
+  toile.width = taille
+  toile.height = taille
+  const contexte = toile.getContext('2d')
+  if (!contexte) return new ImageData(taille, taille)
+  contexte.beginPath()
+  contexte.moveTo(4, 4)
+  contexte.lineTo(21, 12)
+  contexte.lineTo(4, 20)
+  contexte.lineTo(8, 12)
+  contexte.closePath()
+  contexte.fillStyle = '#ffffff'
+  contexte.strokeStyle = '#00205b'
+  contexte.lineWidth = 2
+  contexte.stroke()
+  contexte.fill()
+  return contexte.getImageData(0, 0, taille, taille)
+}
+
+function afficherCoursEau(): void {
+  if (!carte) return
+  const source = carte.getSource(SOURCE_COURS_EAU) as { setData: (donnees: ContourSet) => void } | undefined
+  source?.setData({ type: 'FeatureCollection', features: props.coursEau.map((cours) => cours.trace) })
+}
 
 /** Étend les limites avec toutes les coordonnées d'un contour. */
 function etendreLimites(limites: InstanceType<typeof import('maplibre-gl').LngLatBounds>, coordonnees: unknown): void {
@@ -87,11 +118,19 @@ onMounted(async () => {
       sources: {
         planIgn: { type: 'raster', tiles: [FOND_PLAN_IGN], tileSize: 256, attribution: '© IGN – Géoplateforme' },
         [SOURCE_CONTOUR]: { type: 'geojson', data: CONTOURS_VIDES },
+        [SOURCE_COURS_EAU]: { type: 'geojson', data: CONTOURS_VIDES },
       },
       layers: [
         { id: 'plan-ign', type: 'raster', source: 'planIgn' },
         { id: 'bassin-remplissage', type: 'fill', source: SOURCE_CONTOUR, paint: { 'fill-color': '#000091', 'fill-opacity': 0.12 } },
         { id: 'bassin-trait', type: 'line', source: SOURCE_CONTOUR, paint: { 'line-color': '#000091', 'line-width': 3, 'line-dasharray': [4, 2] } },
+        { id: 'cours-eau-trait', type: 'line', source: SOURCE_COURS_EAU, paint: { 'line-color': '#0a5fa8', 'line-width': 3 } },
+        {
+          id: 'cours-eau-fleches',
+          type: 'symbol',
+          source: SOURCE_COURS_EAU,
+          layout: { 'symbol-placement': 'line', 'symbol-spacing': 90, 'icon-image': IMAGE_FLECHE, 'icon-size': 0.7, 'icon-allow-overlap': true },
+        },
       ],
     },
     center: [2.35, 46.6],
@@ -101,8 +140,10 @@ onMounted(async () => {
   carte.addControl(new maplibre.NavigationControl({ showCompass: false }))
   carte.on('click', (evenement) => emit('choisirPoint', [evenement.lngLat.lng, evenement.lngLat.lat]))
   carte.on('load', () => {
+    carte?.addImage(IMAGE_FLECHE, dessinerFleche())
     afficherPoint()
     afficherBassin()
+    afficherCoursEau()
   })
 })
 
@@ -111,6 +152,7 @@ watch(() => props.point, () => {
   centrerSurPoint()
 })
 watch(() => props.bassin, afficherBassin)
+watch(() => props.coursEau, afficherCoursEau)
 onUnmounted(() => carte?.remove())
 </script>
 
