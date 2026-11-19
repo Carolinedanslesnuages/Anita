@@ -5,7 +5,10 @@ import { adresseZonesInondables, COUCHES_SURFACES_INONDABLES, lireZonesInondable
 async function chercherUneCouche(limites: Limites, couche: string): Promise<ZoneInondable[]> {
   const reponse = await fetch(adresseZonesInondables(limites, couche))
   if (!reponse.ok) throw new Error(`Service des zones inondables indisponible (${reponse.status})`)
-  return lireZonesInondables(await reponse.json())
+  // Sans surface dans la zone, le service répond une page vide (et non une liste vide) : aucune zone.
+  const texte = await reponse.text()
+  if (texte.trim() === '') return []
+  return lireZonesInondables(JSON.parse(texte))
 }
 
 /** Les zones inondables d'un bassin (service public Géorisques) : une demande par niveau de crue. */
