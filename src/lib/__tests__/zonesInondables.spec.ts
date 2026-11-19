@@ -15,13 +15,14 @@ describe('zones inondables (lecture de la source)', () => {
   })
 
   it('ne demande que les zones de la boîte du bassin (latitude avant longitude)', () => {
-    const adresse = new URL(adresseZonesInondables([-2, 47, -1, 48]))
+    const adresse = new URL(adresseZonesInondables([-2, 47, -1, 48], 'ms:ALEA_SYNT_01_01FOR_FXX'))
+    expect(adresse.searchParams.get('TYPENAMES')).toBe('ms:ALEA_SYNT_01_01FOR_FXX')
     expect(adresse.searchParams.get('BBOX')).toBe('47,-2,48,-1,urn:ogc:def:crs:EPSG::4326')
   })
 
   it('reconnaît les trois niveaux et ignore les autres scénarios', () => {
     const zones = lireZonesInondables({
-      features: [surface('01For', 'Rennes'), surface('02Moy', 'Pacé'), surface('03Fai', 'Rennes, Vern'), surface('04Ext', 'Autre')],
+      features: [surface('01For', 'Rennes'), surface('02Moy', 'Pacé'), surface('04Fai', 'Rennes, Vern'), surface('04Ext', 'Autre')],
     })
     expect(zones.map((zone) => zone.niveau)).toEqual(['frequente', 'moyenne', 'forte'])
     expect(zones[2]?.communes).toEqual(['Rennes', 'Vern'])

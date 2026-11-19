@@ -21,7 +21,7 @@ export interface NiveauCrue {
 export const NIVEAUX_CRUE: NiveauCrue[] = [
   { id: 'frequente', libelle: 'Crue fréquente', motif: 'hachures', descriptionMotif: 'hachures obliques', scenarios: ['01for', 'frequent', 'fort'] },
   { id: 'moyenne', libelle: 'Crue moyenne', motif: 'points', descriptionMotif: 'points', scenarios: ['02moy', 'moyen'] },
-  { id: 'forte', libelle: 'Crue forte (probabilité faible)', motif: 'quadrillage', descriptionMotif: 'quadrillage', scenarios: ['03fai', 'faible'] },
+  { id: 'forte', libelle: 'Crue forte (probabilité faible)', motif: 'quadrillage', descriptionMotif: 'quadrillage', scenarios: ['04fai', '03fai', 'faible'] },
 ]
 
 export interface ZoneInondable {
@@ -32,19 +32,20 @@ export interface ZoneInondable {
 }
 
 const ADRESSE_GEORISQUES = 'https://www.georisques.gouv.fr/services'
-const COUCHE_SURFACES_INONDABLES = 'ms:surface_inondable'
-export const NOMBRE_MAXIMUM_ZONES = 300
+/** Une couche par niveau de crue : débordement de cours d'eau, fréquent, moyen, faible. */
+export const COUCHES_SURFACES_INONDABLES = ['ms:ALEA_SYNT_01_01FOR_FXX', 'ms:ALEA_SYNT_01_02MOY_FXX', 'ms:ALEA_SYNT_01_04FAI_FXX']
+export const NOMBRE_MAXIMUM_ZONES = 100
 
-/** Adresse de la requête « quelles zones inondables touchent cette zone ? ». */
-export function adresseZonesInondables(limites: Limites): string {
+/** Adresse de la requête « quelles zones inondables de cette couche touchent cette zone ? ». */
+export function adresseZonesInondables(limites: Limites, couche: string): string {
   const [ouest, sud, est, nord] = limites
   const repere = 'urn:ogc:def:crs:EPSG::4326'
   const parametres = new URLSearchParams({
     SERVICE: 'WFS',
     VERSION: '2.0.0',
     REQUEST: 'GetFeature',
-    TYPENAMES: COUCHE_SURFACES_INONDABLES,
-    OUTPUTFORMAT: 'application/json',
+    TYPENAMES: couche,
+    OUTPUTFORMAT: 'geojson',
     SRSNAME: repere,
     COUNT: String(NOMBRE_MAXIMUM_ZONES),
     // Le service attend la latitude avant la longitude pour ce repère.
