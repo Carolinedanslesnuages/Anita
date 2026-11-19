@@ -12,4 +12,4 @@
 | Lancer | `npm run dev` |
 
 ## Stories réalisées
-_(aucune pour l'instant)_
+- #2 — Trouver sa commune et voir son bassin versant (recherche de commune, clic sur la carte, contour et nom du bassin, texte à côté de la carte)
