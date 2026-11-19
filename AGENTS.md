@@ -24,8 +24,9 @@ des filtres. Données : `src/donnees/lieux.json` (GeoJSON), lues via le store `l
   ou fait, en toutes lettres (`salleLibre`, `reservationsDuJour`, `violation`), jamais `el`,
   `x`, `s`, `tmp`, `data2`. Seuls les noms imposés par les bibliothèques restent tels quels
   (`vi`, `expect`, `app`…). Contrôlé par le lint (`id-length`, 3 caractères minimum) : la CI échoue sinon.
-- Vue 3, `<script setup lang="ts">`, un dossier `src/views/` par écran, composants DSFR (`Dsfr*`
-  de `@gouvminint/vue-dsfr`) plutôt que du HTML maison.
+- Vue 3, `<script setup lang="ts">`, un dossier `src/views/` par écran. **Pas de DSFR** (décision du
+  PO : ce n'est pas un projet d'administration) : HTML sémantique natif et styles maison dans
+  `src/styles/base.css` (classes `bouton`, `champ`…). Marque : « Anita — Votre territoire, dessiné par l'eau ».
 - Données : uniquement depuis `src/donnees/*.json`, **via un store Pinia** (jamais lues directement
   par un écran) : on pourra les remplacer par une vraie API sans toucher aux écrans.
 - **Pinia** (installé et activé dans `src/main.ts`) : créer un store `src/stores/<domaine>.ts`
@@ -43,8 +44,8 @@ des filtres. Données : `src/donnees/lieux.json` (GeoJSON), lues via le store `l
 Le service doit être utilisable par tous (RGAA 4, obligatoire dans l'administration). À chaque
 écran ou composant, sans exception :
 
-- **Composants DSFR** d'abord (`Dsfr*`) : ils sont déjà accessibles ; ne pas recoder un bouton,
-  un champ ou une alerte en HTML maison. Ne jamais changer leurs couleurs (contrastes du DSFR).
+- **HTML natif** (`button`, `label`, `fieldset`, `nav`…) plutôt que des `div` cliquables ; couleurs
+  du fichier de styles, contraste suffisant (4,5:1 pour le texte).
 - **Page** : `lang="fr"`, un titre de page (`<title>`) qui dit où l'on est, un seul `h1`, des
   titres `h2`, `h3`… sans saut de niveau ; liens d'évitement conservés.
 - **Images** : alternative qui dit l'information (`alt="…"`), ou `alt=""` si décorative.
