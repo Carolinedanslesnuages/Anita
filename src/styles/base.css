@@ -1,0 +1,111 @@
+/* Styles d'Anita : sobres, lisibles, contrastés (texte foncé sur fond clair, bleu eau). */
+:root {
+  --couleur-texte: #14213d;
+  --couleur-fond: #ffffff;
+  --couleur-eau: #0b5c8a;
+  --couleur-eau-fonce: #073b5a;
+  --couleur-fond-doux: #eef5f9;
+  --couleur-bordure: #8aa4b5;
+  --couleur-erreur: #b00020;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--couleur-texte);
+  background: var(--couleur-fond);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--couleur-eau);
+}
+
+:focus-visible {
+  outline: 3px solid #b45f00;
+  outline-offset: 2px;
+}
+
+.conteneur {
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.lien-evitement {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  background: var(--couleur-fond);
+  color: var(--couleur-eau-fonce);
+}
+.lien-evitement:focus {
+  top: 0.5rem;
+}
+
+.bouton {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--couleur-eau);
+  border-radius: 0.25rem;
+  background: var(--couleur-eau);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.bouton:hover {
+  background: var(--couleur-eau-fonce);
+}
+.bouton--secondaire {
+  background: var(--couleur-fond);
+  color: var(--couleur-eau-fonce);
+}
+.bouton--secondaire:hover {
+  background: var(--couleur-fond-doux);
+}
+.bouton--petit {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.champ {
+  margin-bottom: 1rem;
+}
+.champ label {
+  display: block;
+  font-weight: 600;
+}
+.champ .aide {
+  display: block;
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+.champ input[type='text'],
+.champ input[type='search'] {
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--couleur-eau-fonce);
+  border-radius: 0.25rem;
+  font: inherit;
+  color: inherit;
+  background: var(--couleur-fond);
+}
+
+.texte-gras {
+  font-weight: 700;
+}
+.aide-texte {
+  font-size: 0.875rem;
+}

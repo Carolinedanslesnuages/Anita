@@ -76,32 +76,48 @@ onUnmounted(() => clearTimeout(minuteur))
 </script>
 
 <template>
-  <form class="fr-mb-2w" @submit.prevent="surValidation">
-    <DsfrInput
-      id="recherche-commune"
-      :model-value="saisie"
-      label="Nom de votre commune"
-      hint="Tapez au moins 2 lettres, puis choisissez une commune dans les suggestions."
-      autocomplete="off"
-      @update:model-value="surFrappe"
-    />
-    <DsfrButton class="fr-mt-2w" type="submit" label="Rechercher la commune" icon="fr-icon-search-line" />
-    <p class="fr-mt-2w fr-mb-1w fr-text--bold" role="status">{{ annonce }}</p>
-    <ul v-if="suggestions.length" class="suggestions fr-p-0 fr-m-0" aria-label="Communes proposées">
-      <li v-for="commune in suggestions" :key="commune.code" class="fr-mb-1w">
-        <DsfrButton
-          tertiary
-          size="sm"
-          :label="commune.departement ? `${commune.nom} (${commune.departement})` : commune.nom"
-          @click="choisir(commune)"
-        />
+  <form class="recherche" @submit.prevent="surValidation">
+    <div class="champ">
+      <label for="recherche-commune">
+        Nom de votre commune
+        <span id="aide-recherche-commune" class="aide">
+          Tapez au moins 2 lettres, puis choisissez une commune dans les suggestions.
+        </span>
+      </label>
+      <input
+        id="recherche-commune"
+        type="text"
+        :value="saisie"
+        autocomplete="off"
+        aria-describedby="aide-recherche-commune"
+        @input="surFrappe(($event.target as HTMLInputElement).value)"
+      />
+    </div>
+    <button class="bouton" type="submit">Rechercher la commune</button>
+    <p class="annonce texte-gras" role="status">{{ annonce }}</p>
+    <ul v-if="suggestions.length" class="suggestions" aria-label="Communes proposées">
+      <li v-for="commune in suggestions" :key="commune.code">
+        <button class="bouton bouton--secondaire bouton--petit" type="button" @click="choisir(commune)">
+          {{ commune.departement ? `${commune.nom} (${commune.departement})` : commune.nom }}
+        </button>
       </li>
     </ul>
   </form>
 </template>
 
 <style scoped>
+.recherche {
+  margin-bottom: 1rem;
+}
+.annonce {
+  margin: 1rem 0 0.5rem;
+}
 .suggestions {
   list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.suggestions li {
+  margin-bottom: 0.5rem;
 }
 </style>

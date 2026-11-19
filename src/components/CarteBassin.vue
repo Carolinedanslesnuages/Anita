@@ -122,20 +122,19 @@ onUnmounted(() => carte?.remove())
       role="region"
       aria-label="Carte du bassin versant (le texte à côté de la carte donne les mêmes informations)"
     />
-    <DsfrButton
-      class="fr-mt-2w"
-      secondary
-      icon="fr-icon-map-pin-2-line"
-      label="Choisir le point au centre de la carte"
-      @click="choisirCentreDeLaCarte"
-    />
-    <p class="fr-hint-text fr-mt-1w">
+    <button class="bouton bouton--secondaire bouton-centre" type="button" @click="choisirCentreDeLaCarte">
+      Choisir le point au centre de la carte
+    </button>
+    <p class="aide-texte">
       Au clavier : placez-vous sur la carte, déplacez-la avec les flèches, puis activez ce bouton.
     </p>
   </div>
 </template>
 
 <style scoped>
+.bouton-centre {
+  margin-top: 1rem;
+}
 .carte {
   width: 100%;
   height: 32rem;
