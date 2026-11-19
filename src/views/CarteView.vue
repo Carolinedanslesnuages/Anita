@@ -2,12 +2,15 @@
 import { storeToRefs } from 'pinia'
 import CarteBassin from '@/components/CarteBassin.vue'
 import ChoixNiveauBassin from '@/components/ChoixNiveauBassin.vue'
+import CoursEauDuBassin from '@/components/CoursEauDuBassin.vue'
 import InfosBassin from '@/components/InfosBassin.vue'
 import RechercheCommune from '@/components/RechercheCommune.vue'
 import { useBassinStore } from '@/stores/bassin'
+import { useCoursEauStore } from '@/stores/coursEau'
 
 const magasin = useBassinStore()
 const { niveau, point, bassin } = storeToRefs(magasin)
+const { affiches: coursEauAffiches, coursEau } = storeToRefs(useCoursEauStore())
 </script>
 
 <template>
@@ -24,7 +27,13 @@ const { niveau, point, bassin } = storeToRefs(magasin)
       <InfosBassin class="bloc-infos" />
     </div>
     <div class="colonne-carte">
-      <CarteBassin :point="point" :bassin="bassin" @choisir-point="magasin.choisirPoint" />
+      <CarteBassin
+        :point="point"
+        :bassin="bassin"
+        :cours-eau="coursEauAffiches ? coursEau : []"
+        @choisir-point="magasin.choisirPoint"
+      />
+      <CoursEauDuBassin />
     </div>
   </div>
 </template>

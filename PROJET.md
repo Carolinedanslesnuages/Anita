@@ -13,3 +13,4 @@
 
 ## Stories réalisées
 - #2 — Trouver sa commune et voir son bassin versant (recherche de commune, clic sur la carte, contour et nom du bassin, texte à côté de la carte)
+- #3 — Afficher le réseau des rivières, en amont et en aval (case « Rivières et affluents », tracés avec flèches, liste en texte avec sens d'écoulement)
