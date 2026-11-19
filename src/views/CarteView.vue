@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import CarteLieux from '@/components/CarteLieux.vue'
-import ListeLieux from '@/components/ListeLieux.vue'
-import { CATEGORIES } from '@/lib/lieux'
-import { useLieuxStore } from '@/stores/lieux'
+import CarteBassin from '@/components/CarteBassin.vue'
+import ChoixNiveauBassin from '@/components/ChoixNiveauBassin.vue'
+import InfosBassin from '@/components/InfosBassin.vue'
+import RechercheCommune from '@/components/RechercheCommune.vue'
+import { useBassinStore } from '@/stores/bassin'
 
-const magasin = useLieuxStore()
-const { categoriesChoisies, lieuxAffiches, lieuChoisi } = storeToRefs(magasin)
-const options = CATEGORIES.map((categorie) => ({ id: `categorie-${categorie.id}`, name: 'categories', label: categorie.libelle, value: categorie.id }))
-const annonce = computed(() => `${lieuxAffiches.value.length} lieu${lieuxAffiches.value.length > 1 ? 'x' : ''} affiché${lieuxAffiches.value.length > 1 ? 's' : ''}`)
+const magasin = useBassinStore()
+const { niveau, point, bassin } = storeToRefs(magasin)
 </script>
 
 <template>
   <h1>Mon bassin versant</h1>
-  <p>Les lieux sont présentés sur une carte et dans une liste, qui donnent les mêmes informations.</p>
-
-  <DsfrCheckboxSet v-model="categoriesChoisies" legend="Afficher" :options="options" inline />
-  <p class="fr-text--bold" role="status">{{ annonce }}</p>
+  <p>
+    Trouvez votre commune, ou choisissez un point sur la carte, pour découvrir le territoire de l’eau auquel vous
+    appartenez. La carte et le texte donnent les mêmes informations.
+  </p>
 
   <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-lg-8">
-      <CarteLieux :lieux="lieuxAffiches" :lieu-choisi="lieuChoisi" @choisir="magasin.choisir" />
+    <div class="fr-col-12 fr-col-lg-4">
+      <RechercheCommune @choisir="magasin.choisirCommune" />
+      <ChoixNiveauBassin :niveau="niveau" @changer="magasin.changerNiveau" />
+      <InfosBassin class="fr-mt-4w" />
     </div>
-    <section class="fr-col-12 fr-col-lg-4" aria-labelledby="titre-liste">
-      <h2 id="titre-liste" class="fr-h5">Liste des lieux</h2>
-      <p v-if="lieuxAffiches.length === 0">Aucun lieu pour ces filtres : cochez au moins une catégorie.</p>
-      <ListeLieux v-else :lieux="lieuxAffiches" :lieu-choisi="lieuChoisi" @choisir="magasin.choisir" />
-    </section>
+    <div class="fr-col-12 fr-col-lg-8">
+      <CarteBassin :point="point" :bassin="bassin" @choisir-point="magasin.choisirPoint" />
+    </div>
   </div>
 </template>
