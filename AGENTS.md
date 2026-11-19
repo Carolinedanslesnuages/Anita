@@ -1,4 +1,4 @@
-# Mon bassin versant — instructions pour les agents de code
+# Anita — instructions pour les agents de code
 
 Lu par Codex, OpenCode, Cursor, Copilot, Gemini CLI… ; `CLAUDE.md` l'importe pour Claude Code.
 
