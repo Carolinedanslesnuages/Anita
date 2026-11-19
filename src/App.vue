@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-
-const logoText = ['République', 'Française']
+import EnTeteAnita from '@/components/EnTeteAnita.vue'
+import PiedDePageAnita from '@/components/PiedDePageAnita.vue'
 </script>
 
 <template>
-  <DsfrHeader
-    service-title="Mon bassin versant"
-    service-description=""
-    :logo-text="logoText"
-    home-to="/"
-  />
-  <main id="contenu" class="fr-container fr-my-6w">
+  <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+  <EnTeteAnita />
+  <main id="contenu" class="conteneur contenu-principal">
     <RouterView />
   </main>
-  <DsfrFooter :logo-text="logoText" />
+  <PiedDePageAnita />
 </template>
+
+<style scoped>
+.contenu-principal {
+  padding-top: 1.5rem;
+}
+</style>

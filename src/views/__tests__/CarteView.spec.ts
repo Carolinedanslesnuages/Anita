@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import VueDsfr from '@gouvminint/vue-dsfr'
 import type { Bassin, Commune, IdNiveau, Position } from '@/lib/bassins'
 import { violationsAccessibilite } from '@/__tests__/accessibilite'
 
@@ -31,7 +30,7 @@ const CarteRemplacee = {
 }
 const monter = () =>
   mount(CarteView, {
-    global: { plugins: [VueDsfr], stubs: { CarteBassin: CarteRemplacee } },
+    global: { stubs: { CarteBassin: CarteRemplacee } },
     attachTo: document.body,
   })
 

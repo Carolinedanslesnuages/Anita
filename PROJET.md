@@ -1,8 +1,8 @@
-# Mon bassin versant
+# Anita — Votre territoire, dessiné par l'eau
 
 **Objectif :** Une carte interactive qui efface les limites administratives habituelles (communes, départements, régions) pour révéler le territoire naturel auquel on appartient réellement : celui de l'eau.
 **Type :** carte interactive (lieux sur fond IGN, liste accessible, filtres)
-**Stack :** Vue 3, DSFR, MapLibre (modèle ADA `carte`)
+**Stack :** Vue 3, MapLibre, styles maison sobres (pas de DSFR : le projet n'est pas un service public)
 **Lieux :** `src/donnees/lieux.json`
 **Créé le :** 2026-11-19 par Carolinedanslesnuages
 
