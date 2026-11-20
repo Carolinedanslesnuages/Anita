@@ -2,16 +2,17 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import type { Bassin, ContourGeoJson, IdNiveau, Position } from '@/lib/bassins'
+import type { Limites } from '@/lib/coursEau'
 import type { ZoneInondable } from '@/lib/zonesInondables'
 import { violationsAccessibilite } from '@/__tests__/accessibilite'
 
-const { chercherBassinAuPoint, chercherZonesInondablesDuBassin } = vi.hoisted(() => ({
+const { chercherBassinAuPoint, chercherZonesInondablesDansLaZone } = vi.hoisted(() => ({
   chercherBassinAuPoint: vi.fn<(position: Position, niveau: IdNiveau) => Promise<Bassin | null>>(),
-  chercherZonesInondablesDuBassin: vi.fn<(contour: ContourGeoJson) => Promise<ZoneInondable[]>>(),
+  chercherZonesInondablesDansLaZone: vi.fn<(limites: Limites) => Promise<ZoneInondable[]>>(),
 }))
 vi.mock('@/services/communesService', () => ({ chercherCommunes: vi.fn<() => Promise<never[]>>() }))
 vi.mock('@/services/bassinsService', () => ({ chercherBassinAuPoint }))
-vi.mock('@/services/zonesInondablesService', () => ({ chercherZonesInondablesDuBassin }))
+vi.mock('@/services/zonesInondablesService', () => ({ chercherZonesInondablesDansLaZone }))
 vi.mock('@/services/coursEauService', () => ({ chercherCoursEauDuBassin: vi.fn<() => Promise<never[]>>().mockResolvedValue([]) }))
 
 const { default: CarteView } = await import('../CarteView.vue')
@@ -33,9 +34,9 @@ const zonesDuBassin: ZoneInondable[] = [
 // La carte (WebGL) est remplacée : elle reçoit les zones à tracer, qu'on lit ici.
 const CarteRemplacee = {
   props: ['zonesInondables'],
-  emits: ['choisirPoint'],
+  emits: ['choisirPoint', 'changerZoneVisible'],
   template:
-    '<div role="region" aria-label="Carte du bassin versant"><button type="button" id="clic-carte" @click="$emit(\'choisirPoint\', [-2, 48])">Cliquer sur la carte</button><span id="zones-sur-la-carte">{{ zonesInondables.length }}</span></div>',
+    '<div role="region" aria-label="Carte du bassin versant"><button type="button" id="clic-carte" @click="$emit(\'choisirPoint\', [-2, 48])">Cliquer sur la carte</button><button type="button" id="zoomer" @click="$emit(\'changerZoneVisible\', [-2, 47, -1.9, 47.1], 12)">Zoomer</button><button type="button" id="dezoomer" @click="$emit(\'changerZoneVisible\', [-5, 45, 2, 50], 8)">Dézoomer</button><span id="zones-sur-la-carte">{{ zonesInondables.length }}</span></div>',
 }
 const monter = () => mount(CarteView, { global: { stubs: { CarteBassin: CarteRemplacee } }, attachTo: document.body })
 
@@ -43,7 +44,7 @@ describe('Afficher les zones inondables', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     chercherBassinAuPoint.mockReset().mockResolvedValue(vilaine)
-    chercherZonesInondablesDuBassin.mockReset().mockResolvedValue(zonesDuBassin)
+    chercherZonesInondablesDansLaZone.mockReset().mockResolvedValue(zonesDuBassin)
   })
   afterEach(() => {
     document.body.innerHTML = ''
@@ -52,22 +53,39 @@ describe('Afficher les zones inondables', () => {
   async function afficherUnBassin(wrapper: ReturnType<typeof monter>) {
     await wrapper.find('#clic-carte').trigger('click')
     await flushPromises()
+    await wrapper.find('#zoomer').trigger('click')
+    await flushPromises()
   }
 
   it('propose une case « Zones inondables », décochée au départ', () => {
     const wrapper = monter()
     expect(wrapper.find('label[for="afficher-zones-inondables"]').text()).toBe('Zones inondables')
     expect(wrapper.find<HTMLInputElement>('#afficher-zones-inondables').element.checked).toBe(false)
-    expect(chercherZonesInondablesDuBassin).not.toHaveBeenCalled()
+    expect(chercherZonesInondablesDansLaZone).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
-  it('cocher affiche les zones sur la carte, décocher les masque, et seul le bassin choisi est demandé', async () => {
+  it('demande de zoomer quand la carte est trop large, sans interroger le service', async () => {
+    const wrapper = monter()
+    await afficherUnBassin(wrapper)
+    await wrapper.find('#dezoomer').trigger('click')
+    await wrapper.find('#afficher-zones-inondables').setValue(true)
+    await flushPromises()
+    expect(chercherZonesInondablesDansLaZone).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('Zoomez sur la carte pour voir les zones inondables')
+    expect(wrapper.find('#zones-sur-la-carte').text()).toBe('0')
+    await wrapper.find('#zoomer').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('#zones-sur-la-carte').text()).toBe('3')
+    wrapper.unmount()
+  })
+
+  it('cocher affiche les zones sur la carte, décocher les masque, et seule la partie visible est demandée', async () => {
     const wrapper = monter()
     await afficherUnBassin(wrapper)
     await wrapper.find('#afficher-zones-inondables').setValue(true)
     await flushPromises()
-    expect(chercherZonesInondablesDuBassin).toHaveBeenCalledWith(vilaine.contour)
+    expect(chercherZonesInondablesDansLaZone).toHaveBeenCalledWith([-2, 47, -1.9, 47.1])
     expect(wrapper.find('#zones-sur-la-carte').text()).toBe('3')
     await wrapper.find('#afficher-zones-inondables').setValue(false)
     await flushPromises()
@@ -109,12 +127,12 @@ describe('Afficher les zones inondables', () => {
     await wrapper.find('#afficher-zones-inondables').setValue(true)
     await flushPromises()
     expect(wrapper.text()).toContain('Choisissez d’abord un bassin versant pour voir ses zones inondables')
-    expect(chercherZonesInondablesDuBassin).not.toHaveBeenCalled()
+    expect(chercherZonesInondablesDansLaZone).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 
   it('dit clairement quand Géorisques ne répond pas', async () => {
-    chercherZonesInondablesDuBassin.mockRejectedValueOnce(new Error('panne'))
+    chercherZonesInondablesDansLaZone.mockRejectedValueOnce(new Error('panne'))
     const wrapper = monter()
     await afficherUnBassin(wrapper)
     await wrapper.find('#afficher-zones-inondables').setValue(true)

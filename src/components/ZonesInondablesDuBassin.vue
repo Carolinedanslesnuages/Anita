@@ -16,9 +16,10 @@ const communesDesNiveaux = computed(() => communesParNiveau(magasin.zones))
 const annonce = computed(() => {
   if (!magasin.affichees) return ''
   if (!bassinStore.bassin) return 'Choisissez d’abord un bassin versant pour voir ses zones inondables.'
+  if (magasin.carteTropLarge) return 'Zoomez sur la carte pour voir les zones inondables : elles ne s’affichent que de près.'
   if (magasin.chargement) return 'Recherche des zones inondables en cours…'
   if (magasin.erreur) return magasin.erreur
-  if (magasin.zones.length === 0) return 'Aucune zone inondable n’est connue dans ce bassin.'
+  if (magasin.zones.length === 0) return 'Aucune zone inondable n’est connue dans la partie visible de la carte.'
   const nombre = communesDesNiveaux.value.length
   return `Zones inondables affichées : ${nombre} ${nombre > 1 ? 'niveaux de crue' : 'niveau de crue'}.`
 })
@@ -37,7 +38,7 @@ function surChangement(evenement: Event): void {
     </div>
     <p class="aide-texte">Chaque niveau de crue a son motif sur la carte, expliqué dans la légende et la liste ci-dessous.</p>
     <p role="status">{{ annonce }}</p>
-    <template v-if="magasin.affichees && magasin.zones.length > 0">
+    <template v-if="magasin.affichees && bassinStore.bassin">
       <h3 id="titre-legende-zones" class="sous-titre-zones">Légende des motifs</h3>
       <ul aria-labelledby="titre-legende-zones" class="legende-zones">
         <li v-for="niveau in NIVEAUX_CRUE" :key="niveau.id">
@@ -45,6 +46,8 @@ function surChangement(evenement: Event): void {
           {{ niveau.libelle }} : {{ niveau.descriptionMotif }}
         </li>
       </ul>
+    </template>
+    <template v-if="magasin.affichees && magasin.zones.length > 0">
       <h3 id="titre-communes-zones" class="sous-titre-zones">Communes concernées</h3>
       <ul aria-labelledby="titre-communes-zones" class="liste-zones">
         <li v-for="element in communesDesNiveaux" :key="element.niveau.id">

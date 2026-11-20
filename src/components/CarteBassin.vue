@@ -5,7 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 // Le worker de MapLibre, construit par Vite (sinon introuvable une fois le site construit).
 import adresseWorker from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Bassin, ContourSet, Position } from '@/lib/bassins'
-import type { CoursEau } from '@/lib/coursEau'
+import type { CoursEau, Limites } from '@/lib/coursEau'
 import { NIVEAUX_CRUE, type ZoneInondable } from '@/lib/zonesInondables'
 import { dessinerMotif, nomImageMotif } from '@/components/motifsZonesInondables'
 
@@ -14,7 +14,7 @@ import { dessinerMotif, nomImageMotif } from '@/components/motifsZonesInondables
  * et son nom écrit sur la carte. Le texte à côté de la carte (InfosBassin) reste l'alternative accessible.
  */
 const props = defineProps<{ point: Position | null; bassin: Bassin | null; coursEau: CoursEau[]; zonesInondables: ZoneInondable[] }>()
-const emit = defineEmits<{ choisirPoint: [position: Position] }>()
+const emit = defineEmits<{ choisirPoint: [position: Position]; changerZoneVisible: [limites: Limites, zoom: number] }>()
 
 const conteneur = useTemplateRef<HTMLDivElement>('conteneur')
 let carte: CarteMapLibre | null = null
@@ -105,6 +105,13 @@ function afficherBassin(): void {
   }
 }
 
+/** Dit quelle partie de la carte est visible, pour ne demander que les zones inondables de cette partie. */
+function annoncerZoneVisible(): void {
+  if (!carte) return
+  const limites = carte.getBounds()
+  emit('changerZoneVisible', [limites.getWest(), limites.getSouth(), limites.getEast(), limites.getNorth()], carte.getZoom())
+}
+
 function centrerSurPoint(): void {
   if (carte && props.point && !props.bassin) carte.flyTo({ center: props.point, zoom: 12, essential: false })
 }
@@ -164,7 +171,9 @@ onMounted(async () => {
     afficherBassin()
     afficherCoursEau()
     afficherZonesInondables()
+    annoncerZoneVisible()
   })
+  carte.on('moveend', annoncerZoneVisible)
 })
 
 watch(() => props.point, () => {

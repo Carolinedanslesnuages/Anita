@@ -1,5 +1,4 @@
-import type { ContourGeoJson } from '@/lib/bassins'
-import { limitesDuContour, type Limites } from '@/lib/coursEau'
+import type { Limites } from '@/lib/coursEau'
 import { adresseZonesInondables, COUCHES_SURFACES_INONDABLES, lireZonesInondables, type ZoneInondable } from '@/lib/zonesInondables'
 
 async function chercherUneCouche(limites: Limites, couche: string): Promise<ZoneInondable[]> {
@@ -11,10 +10,8 @@ async function chercherUneCouche(limites: Limites, couche: string): Promise<Zone
   return lireZonesInondables(JSON.parse(texte))
 }
 
-/** Les zones inondables d'un bassin (service public Géorisques) : une demande par niveau de crue. */
-export async function chercherZonesInondablesDuBassin(contour: ContourGeoJson): Promise<ZoneInondable[]> {
-  const limites = limitesDuContour(contour)
-  if (!limites) return []
+/** Les zones inondables d'une zone de la carte (service public Géorisques) : une demande par niveau de crue. */
+export async function chercherZonesInondablesDansLaZone(limites: Limites): Promise<ZoneInondable[]> {
   const parNiveau = await Promise.all(COUCHES_SURFACES_INONDABLES.map((couche) => chercherUneCouche(limites, couche)))
   return parNiveau.flat()
 }

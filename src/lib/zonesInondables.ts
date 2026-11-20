@@ -34,7 +34,9 @@ export interface ZoneInondable {
 const ADRESSE_GEORISQUES = 'https://www.georisques.gouv.fr/services'
 /** Une couche par niveau de crue : débordement de cours d'eau, fréquent, moyen, faible. */
 export const COUCHES_SURFACES_INONDABLES = ['ms:ALEA_SYNT_01_01FOR_FXX', 'ms:ALEA_SYNT_01_02MOY_FXX', 'ms:ALEA_SYNT_01_04FAI_FXX']
-export const NOMBRE_MAXIMUM_ZONES = 100
+export const NOMBRE_MAXIMUM_ZONES = 500
+/** En dessous de ce niveau de zoom, la carte est trop large : le service enverrait des milliers de morceaux. */
+export const ZOOM_MINIMUM_ZONES_INONDABLES = 11
 
 /** Adresse de la requête « quelles zones inondables de cette couche touchent cette zone ? ». */
 export function adresseZonesInondables(limites: Limites, couche: string): string {

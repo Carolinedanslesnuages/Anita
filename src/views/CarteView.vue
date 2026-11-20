@@ -13,7 +13,8 @@ import { useZonesInondablesStore } from '@/stores/zonesInondables'
 const magasin = useBassinStore()
 const { niveau, point, bassin } = storeToRefs(magasin)
 const { affiches: coursEauAffiches, coursEau } = storeToRefs(useCoursEauStore())
-const { affichees: zonesAffichees, zones: zonesInondables } = storeToRefs(useZonesInondablesStore())
+const magasinZones = useZonesInondablesStore()
+const { affichees: zonesAffichees, zones: zonesInondables } = storeToRefs(magasinZones)
 </script>
 
 <template>
@@ -36,6 +37,7 @@ const { affichees: zonesAffichees, zones: zonesInondables } = storeToRefs(useZon
         :cours-eau="coursEauAffiches ? coursEau : []"
         :zones-inondables="zonesAffichees ? zonesInondables : []"
         @choisir-point="magasin.choisirPoint"
+        @changer-zone-visible="magasinZones.changerZoneVisible"
       />
       <CoursEauDuBassin />
       <ZonesInondablesDuBassin />

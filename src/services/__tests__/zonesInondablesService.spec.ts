@@ -1,12 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ContourGeoJson } from '@/lib/bassins'
-import { chercherZonesInondablesDuBassin } from '../zonesInondablesService'
+import type { Limites } from '@/lib/coursEau'
+import { chercherZonesInondablesDansLaZone } from '../zonesInondablesService'
 
-const contour: ContourGeoJson = {
-  type: 'Feature',
-  properties: {},
-  geometry: { type: 'Polygon', coordinates: [[[-2, 47], [-1, 47], [-1, 48], [-2, 47]]] },
-}
+const limites: Limites = [-2, 47, -1.9, 47.1]
 
 const surfaceFrequente = { type: 'Feature', properties: { scenario: '01For' }, geometry: { type: 'Polygon', coordinates: [] } }
 
@@ -20,13 +16,13 @@ describe('service des zones inondables', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify({ features: [] })))
       .mockResolvedValueOnce(new Response('', { status: 200 }))
     vi.stubGlobal('fetch', fetchSimule)
-    const zones = await chercherZonesInondablesDuBassin(contour)
+    const zones = await chercherZonesInondablesDansLaZone(limites)
     expect(fetchSimule).toHaveBeenCalledTimes(3)
     expect(zones.map((zone) => zone.niveau)).toEqual(['frequente'])
   })
 
   it('signale une panne du service', async () => {
     vi.stubGlobal('fetch', vi.fn<() => Promise<Response>>().mockResolvedValue(new Response('', { status: 503 })))
-    await expect(chercherZonesInondablesDuBassin(contour)).rejects.toThrow('indisponible')
+    await expect(chercherZonesInondablesDansLaZone(limites)).rejects.toThrow('indisponible')
   })
 })
