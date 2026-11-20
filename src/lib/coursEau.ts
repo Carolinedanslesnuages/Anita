@@ -2,7 +2,7 @@ import type { ContourGeoJson, Position } from '@/lib/bassins'
 import { nomLisible } from '@/lib/bassins'
 
 /**
- * Les cours d'eau d'un bassin (couche « CoursEau_FXX » du Sandre) : requête et lecture de la
+ * Les cours d'eau d'un bassin (couche « CoursEau » du Sandre) : requête et lecture de la
  * réponse (fonctions pures). Les tracés sont numérisés de la source (amont) vers l'embouchure (aval).
  */
 export const NOMBRE_MAXIMUM_COURS_EAU = 20
@@ -49,7 +49,7 @@ export function adresseCoursEau(limites: Limites): string {
     SERVICE: 'WFS',
     VERSION: '2.0.0',
     REQUEST: 'GetFeature',
-    TYPENAMES: 'sa:CoursEau_FXX',
+    TYPENAMES: 'sa:CoursEau',
     OUTPUTFORMAT: 'geojson',
     SRSNAME: repere,
     // Le service attend la latitude avant la longitude pour ce repère.

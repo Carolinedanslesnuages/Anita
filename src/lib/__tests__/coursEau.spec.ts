@@ -11,7 +11,7 @@ function troncon(nom: string | null, code: string, geometry: { type: string; coo
 describe('cours d’eau d’un bassin', () => {
   it('demande la couche des cours d’eau sur les limites du bassin', () => {
     const adresse = adresseCoursEau([-2, 48, -1, 49])
-    expect(adresse).toContain('TYPENAMES=sa%3ACoursEau_FXX')
+    expect(adresse).toContain('TYPENAMES=sa%3ACoursEau&')
     expect(adresse).toContain('48%2C-2%2C49%2C-1')
   })
 
