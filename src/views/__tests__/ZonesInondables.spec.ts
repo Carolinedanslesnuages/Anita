@@ -72,7 +72,7 @@ describe('Afficher les zones inondables', () => {
     await wrapper.find('#afficher-zones-inondables').setValue(true)
     await flushPromises()
     expect(chercherZonesInondablesDansLaZone).not.toHaveBeenCalled()
-    expect(wrapper.text()).toContain('Zoomez sur la carte pour voir les zones inondables')
+    expect(wrapper.text()).toContain('Zoomez sur la carte pour voir chaque niveau de crue avec son motif')
     expect(wrapper.find('#zones-sur-la-carte').text()).toBe('0')
     await wrapper.find('#zoomer').trigger('click')
     await flushPromises()

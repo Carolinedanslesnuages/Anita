@@ -16,7 +16,7 @@ const communesDesNiveaux = computed(() => communesParNiveau(magasin.zones))
 const annonce = computed(() => {
   if (!magasin.affichees) return ''
   if (!bassinStore.bassin) return 'Choisissez d’abord un bassin versant pour voir ses zones inondables.'
-  if (magasin.carteTropLarge) return 'Zoomez sur la carte pour voir les zones inondables : elles ne s’affichent que de près.'
+  if (magasin.carteTropLarge) return 'De loin, toutes les zones inondables sont dessinées d’une seule couleur. Zoomez sur la carte pour voir chaque niveau de crue avec son motif.'
   if (magasin.chargement) return 'Recherche des zones inondables en cours…'
   if (magasin.erreur) return magasin.erreur
   if (magasin.zones.length === 0) return 'Aucune zone inondable n’est connue dans la partie visible de la carte.'
@@ -97,18 +97,18 @@ function surChangement(evenement: Event): void {
   flex: none;
   width: 2rem;
   height: 1.25rem;
-  border: 1px solid #7a1f00;
-  background-color: #ffffff;
+  border: 1px solid #00205b;
+  background-color: #5f7fb5;
 }
 .echantillon--hachures {
-  background-image: repeating-linear-gradient(135deg, #7a1f00 0 2px, transparent 2px 8px);
+  background-image: repeating-linear-gradient(135deg, #ffffff 0 3px, transparent 3px 8px);
 }
 .echantillon--points {
-  background-image: radial-gradient(#7a1f00 2px, transparent 2.5px);
+  background-image: radial-gradient(#ffffff 2.5px, transparent 3px);
   background-size: 8px 8px;
 }
 .echantillon--quadrillage {
-  background-image: linear-gradient(#7a1f00 1px, transparent 1px), linear-gradient(90deg, #7a1f00 1px, transparent 1px);
+  background-image: linear-gradient(#ffffff 2px, transparent 2px), linear-gradient(90deg, #ffffff 2px, transparent 2px);
   background-size: 8px 8px;
 }
 </style>

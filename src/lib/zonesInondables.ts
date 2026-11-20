@@ -38,6 +38,16 @@ export const NOMBRE_MAXIMUM_ZONES = 300
 /** En dessous de ce niveau de zoom (vue de la taille d'une agglomération), le service enverrait trop de morceaux. */
 export const ZOOM_MINIMUM_ZONES_INONDABLES = 10
 
+/**
+ * Adresse des tuiles-images (service WMS) de l'ensemble des zones inondables, tous niveaux confondus :
+ * légères, elles servent de loin, quand les surfaces détaillées seraient trop lourdes. {bbox-epsg-3857} est
+ * remplacé par MapLibre pour chaque tuile.
+ */
+export const ADRESSE_TUILES_ZONES_INONDABLES =
+  `${ADRESSE_GEORISQUES}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&STYLES=&FORMAT=image/png&TRANSPARENT=true` +
+  `&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&LAYERS=${COUCHES_SURFACES_INONDABLES.map((couche) => couche.replace('ms:', '')).join(',')}` +
+  '&BBOX={bbox-epsg-3857}'
+
 /** Adresse de la requête « quelles zones inondables de cette couche touchent cette zone ? ». */
 export function adresseZonesInondables(limites: Limites, couche: string): string {
   const [ouest, sud, est, nord] = limites

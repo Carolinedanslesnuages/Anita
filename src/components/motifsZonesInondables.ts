@@ -1,7 +1,7 @@
 import type { NiveauCrue } from '@/lib/zonesInondables'
 
 /** Couleur des motifs : foncée, pour rester lisible sur le fond de carte. Le motif, lui, distingue les niveaux. */
-const COULEUR_MOTIF = '#7a1f00'
+const COULEUR_MOTIF = '#ffffff'
 const TAILLE = 16
 
 export function nomImageMotif(niveau: NiveauCrue['id']): string {
@@ -17,7 +17,7 @@ export function dessinerMotif(motif: NiveauCrue['motif']): ImageData {
   if (!contexte) return new ImageData(TAILLE, TAILLE)
   contexte.strokeStyle = COULEUR_MOTIF
   contexte.fillStyle = COULEUR_MOTIF
-  contexte.lineWidth = 2
+  contexte.lineWidth = 3
   if (motif === 'hachures') {
     for (const decalage of [-TAILLE, 0, TAILLE]) {
       contexte.moveTo(decalage, TAILLE)
@@ -25,7 +25,7 @@ export function dessinerMotif(motif: NiveauCrue['motif']): ImageData {
     }
     contexte.stroke()
   } else if (motif === 'points') {
-    contexte.arc(TAILLE / 2, TAILLE / 2, 3, 0, Math.PI * 2)
+    contexte.arc(TAILLE / 2, TAILLE / 2, 4.5, 0, Math.PI * 2)
     contexte.fill()
   } else {
     contexte.moveTo(0, 1)

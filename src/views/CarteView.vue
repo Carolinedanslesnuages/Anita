@@ -36,6 +36,7 @@ const { affichees: zonesAffichees, zones: zonesInondables } = storeToRefs(magasi
         :bassin="bassin"
         :cours-eau="coursEauAffiches ? coursEau : []"
         :zones-inondables="zonesAffichees ? zonesInondables : []"
+        :zones-affichees="zonesAffichees"
         @choisir-point="magasin.choisirPoint"
         @changer-zone-visible="magasinZones.changerZoneVisible"
       />
