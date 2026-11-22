@@ -2,11 +2,11 @@
 
 - **Statut** : Accepted
 - **Date** : 2026-11-19
-- **Décideurs** : Carolinedanslesnuages, via ADA
+- **Décideurs** : Carolinedanslesnuages
 - **Sujet** : stack technique du projet Anita
 
 ## Contexte
-Une carte interactive qui efface les limites administratives habituelles (communes, départements, régions) pour révéler le territoire naturel auquel on appartient réellement : celui de l'eau. Le besoin est de situer des lieux sur une carte. Seules les stacks d'ADA sont autorisées.
+Une carte interactive qui efface les limites administratives habituelles (communes, départements, régions) pour révéler le territoire naturel auquel on appartient réellement : celui de l'eau. Le besoin est de situer des lieux sur une carte.
 
 ## Options considérées
 ### Option A — Vue 3 + DSFR + MapLibre, fond « Plan IGN » de la Géoplateforme
