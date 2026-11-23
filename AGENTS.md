@@ -50,7 +50,7 @@ Le service doit être utilisable par tous (RGAA 4, obligatoire dans l'administra
   titres `h2`, `h3`… sans saut de niveau ; liens d'évitement conservés.
 - **Images** : alternative qui dit l'information (`alt="…"`), ou `alt=""` si décorative.
 - **Formulaires** : chaque champ a une étiquette visible liée ; champs obligatoires signalés ;
-  erreurs écrites en clair et reliées au champ (`DsfrInputGroup` avec `error-message`).
+  erreurs écrites en clair et reliées au champ (`aria-describedby` vers le message d'erreur).
 - **Clavier** : tout ce qui se fait à la souris se fait au clavier, dans un ordre logique, avec
   un focus visible ; jamais de `tabindex` positif ; un élément cliquable est un `<button>` ou un lien.
 - **Liens et boutons** : intitulé compréhensible hors contexte (jamais « cliquez ici ») ; un lien
