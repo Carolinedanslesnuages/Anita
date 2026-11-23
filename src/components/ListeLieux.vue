@@ -7,20 +7,20 @@ const emit = defineEmits<{ choisir: [id: string] }>()
 </script>
 
 <template>
-  <ul class="liste-lieux fr-p-0">
-    <li v-for="lieu in lieux" :key="lieu.id" class="fr-mb-2w" :class="{ 'liste-lieux__choisi': lieu.id === lieuChoisi }">
-      <h3 class="fr-h6 fr-mb-1v">{{ lieu.nom }}</h3>
-      <p class="fr-text--sm fr-mb-1v">{{ libelleCategorie(lieu.categorie) }} — {{ lieu.adresse }}</p>
-      <p v-if="lieu.description" class="fr-text--sm fr-mb-1v">{{ lieu.description }}</p>
-      <DsfrButton
-        size="sm"
-        tertiary
-        icon="fr-icon-map-pin-2-line"
-        :label="lieu.id === lieuChoisi ? 'Affiché sur la carte' : 'Voir sur la carte'"
+  <ul class="liste-lieux">
+    <li v-for="lieu in lieux" :key="lieu.id" class="liste-lieux__lieu" :class="{ 'liste-lieux__choisi': lieu.id === lieuChoisi }">
+      <h3 class="liste-lieux__nom">{{ lieu.nom }}</h3>
+      <p class="liste-lieux__texte">{{ libelleCategorie(lieu.categorie) }} — {{ lieu.adresse }}</p>
+      <p v-if="lieu.description" class="liste-lieux__texte">{{ lieu.description }}</p>
+      <button
+        class="bouton bouton--secondaire bouton--petit"
+        type="button"
         :aria-label="`Voir ${lieu.nom} sur la carte`"
         :aria-pressed="lieu.id === lieuChoisi ? 'true' : 'false'"
         @click="emit('choisir', lieu.id)"
-      />
+      >
+        {{ lieu.id === lieuChoisi ? 'Affiché sur la carte' : 'Voir sur la carte' }}
+      </button>
     </li>
   </ul>
 </template>
@@ -28,9 +28,22 @@ const emit = defineEmits<{ choisir: [id: string] }>()
 <style scoped>
 .liste-lieux {
   list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.liste-lieux__lieu {
+  margin-bottom: 1rem;
+}
+.liste-lieux__nom {
+  margin: 0 0 0.25rem;
+  font-size: 1.125rem;
+}
+.liste-lieux__texte {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
 }
 .liste-lieux__choisi {
-  border-left: 4px solid var(--border-active-blue-france);
+  border-left: 4px solid var(--couleur-eau);
   padding-left: 0.75rem;
 }
 </style>
